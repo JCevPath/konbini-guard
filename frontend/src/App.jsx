@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
 export default function KonbiniGuardDashboard() {
@@ -19,41 +19,40 @@ export default function KonbiniGuardDashboard() {
 
   const [confirmingId, setConfirmingId] = useState(null);
 
-  const [currentTime, setCurrentTime] = useState(new Date());
-  useEffect(() => {
-    const timerInterval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timerInterval);
-  }, []);
-
   const evaluateBatchStatus = (expiryString) => {
-    const now = currentTime.getTime();
-    const expiry = new Date(expiryString).getTime();
+    const now = new Date();
+    const expiry = new Date(expiryString);
     const diffMs = expiry - now;
 
-    if (isNaN(expiry)) {
-      return { status: 'Invalid Date', timer: 'Check format', className: 'expired' };
-    }
-
-    if (diffMs <= 0) {
+    if (isNaN(expiry) || diffMs <= 0) {
       return { status: 'Expired', timer: 'Expired', className: 'expired' };
     }
 
-    const diffHours = diffMs / (1000 * 60 * 60);
-    const diffDays = diffHours / 24;
+    let years = expiry.getFullYear() - now.getFullYear();
+    let months = expiry.getMonth() - now.getMonth();
+    let days = expiry.getDate() - now.getDate();
 
-    let timerText = '';
-    if (diffDays >= 1) {
-      const days = Math.floor(diffDays);
-      const hours = Math.floor(diffHours % 24);
-      timerText = `${days}d ${hours}h remaining`;
-    } else {
-      const hoursLeft = Math.floor(diffHours);
-      const minutesLeft = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-      timerText = hoursLeft === 0 ? `${minutesLeft}m remaining` : `${hoursLeft}h ${minutesLeft}m remaining`;
+    if (days < 0) {
+      months -= 1;
+      const prevMonth = new Date(expiry.getFullYear(), expiry.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+    if (months < 0) {
+      years -= 1;
+      months += 12;
     }
 
+    if (years < 0) {
+      return { status: 'Expired', timer: 'Expired', className: 'expired' };
+    }
+
+    let parts = [];
+    if (years > 0) parts.push(`${years}y`);
+    if (months > 0) parts.push(`${months}m`);
+    if (days > 0 || parts.length === 0) parts.push(`${days}d`);
+    const timerText = parts.join(' ');
+
+    const diffHours = diffMs / (1000 * 60 * 60);
     if (diffHours <= 2) {
       return { status: 'Nearly Expired', timer: timerText, className: 'nearly-expired' };
     }
@@ -67,7 +66,8 @@ export default function KonbiniGuardDashboard() {
   }));
 
   const totalActive = evaluatedBatches.length;
-  const freshBatches = evaluatedBatches.filter(b => b.status === 'Fresh' || b.status === 'Nearly Expired').length;
+  const freshBatches = evaluatedBatches.filter(b => b.status === 'Fresh').length;
+  const nearlyExpiredBatches = evaluatedBatches.filter(b => b.status === 'Nearly Expired').length;
   const expiredBatches = evaluatedBatches.filter(b => b.status === 'Expired').length;
 
   const handleRemove = (id) => {
@@ -117,17 +117,21 @@ export default function KonbiniGuardDashboard() {
           </div>
         </header>
 
-        <div className="metrics-grid">
+        <div className="metrics-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
           <div className="metric-card">
-            <p className="metric-title">Total Active Batches</p>
+            <p className="metric-title">Total Active</p>
             <p className="metric-value">{totalActive}</p>
           </div>
           <div className="metric-card">
-            <p className="metric-title">Fresh / Safe Batches</p>
+            <p className="metric-title">Fresh</p>
             <p className="metric-value fresh">{freshBatches}</p>
           </div>
           <div className="metric-card">
-            <p className="metric-title">Expired / Discarded</p>
+            <p className="metric-title">Nearly Expired</p>
+            <p className="metric-value" style={{ color: '#b45309' }}>{nearlyExpiredBatches}</p>
+          </div>
+          <div className="metric-card">
+            <p className="metric-title">Expired</p>
             <p className="metric-value expired">{expiredBatches}</p>
           </div>
         </div>
@@ -137,7 +141,7 @@ export default function KonbiniGuardDashboard() {
           <div className="card">
             <div className="card-header">
               <h2 className="card-title">Live Inventory Status</h2>
-              <span className="card-note">Auto-updating every second</span>
+              <span className="card-note">Tracking shelf life in Years, Months, and Days</span>
             </div>
 
             <div className="table-responsive">
@@ -147,7 +151,7 @@ export default function KonbiniGuardDashboard() {
                     <th>Item & Category</th>
                     <th>Quantity</th>
                     <th>Status</th>
-                    <th>Shelf-Life Timer</th>
+                    <th>Remaining Shelf Life</th>
                     <th style={{ textAlign: 'right' }}>Action</th>
                   </tr>
                 </thead>
@@ -285,7 +289,7 @@ export default function KonbiniGuardDashboard() {
               </div>
 
               <button type="submit" className="submit-btn">
-                Register & Start Timer
+                Register & Save Batch
               </button>
             </form>
           </div>
