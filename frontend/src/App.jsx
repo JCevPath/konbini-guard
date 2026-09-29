@@ -156,50 +156,58 @@ export default function KonbiniGuardDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {evaluatedBatches.map((batch) => (
-                    <tr key={batch.id}>
-                      <td>
-                        <div className="item-name">{batch.name}</div>
-                        <div className="item-category">{batch.category}</div>
-                      </td>
-                      <td style={{ fontWeight: 500, color: '#334155' }}>{batch.quantity} units</td>
-                      <td>
-                        <span className={`status-badge ${batch.className}`}>
-                          <span className={`status-dot ${batch.className}`}></span>
-                          {batch.status}
-                        </span>
-                      </td>
-                      <td className={`timer ${batch.className}`}>
-                        {batch.timer}
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        {confirmingId === batch.id ? (
-                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Remove?</span>
+                  {evaluatedBatches.map((batch) => {
+                    const isOutOfStock = batch.quantity === 0;
+                    return (
+                      <tr key={batch.id}>
+                        <td>
+                          <div className="item-name">{batch.name}</div>
+                          <div className="item-category">{batch.category}</div>
+                        </td>
+                        <td style={{ 
+                          fontWeight: 500, 
+                          color: isOutOfStock ? '#dc2626' : '#334155' 
+                        }}>
+                          {isOutOfStock ? 'Out of stocks' : `${batch.quantity} units`}
+                        </td>
+                        <td>
+                          <span className={`status-badge ${batch.className}`}>
+                            <span className={`status-dot ${batch.className}`}></span>
+                            {batch.status}
+                          </span>
+                        </td>
+                        <td className={`timer ${batch.className}`}>
+                          {batch.timer}
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          {confirmingId === batch.id ? (
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Remove?</span>
+                              <button 
+                                onClick={() => handleRemove(batch.id)}
+                                style={{ backgroundColor: '#e11d48', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
+                              >
+                                Yes
+                              </button>
+                              <button 
+                                onClick={() => setConfirmingId(null)}
+                                style={{ backgroundColor: '#e2e8f0', color: '#334155', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
+                              >
+                                No
+                              </button>
+                            </div>
+                          ) : (
                             <button 
-                              onClick={() => handleRemove(batch.id)}
-                              style={{ backgroundColor: '#e11d48', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
+                              onClick={() => setConfirmingId(batch.id)}
+                              className="remove-btn"
                             >
-                              Yes
+                              Remove
                             </button>
-                            <button 
-                              onClick={() => setConfirmingId(null)}
-                              style={{ backgroundColor: '#e2e8f0', color: '#334155', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
-                            >
-                              No
-                            </button>
-                          </div>
-                        ) : (
-                          <button 
-                            onClick={() => setConfirmingId(batch.id)}
-                            className="remove-btn"
-                          >
-                            Remove
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -245,7 +253,7 @@ export default function KonbiniGuardDashboard() {
                     value={quantity} 
                     onChange={(e) => setQuantity(e.target.value)}
                     className="form-input"
-                    min="1"
+                    min="0"
                     required
                   />
                 </div>
