@@ -1,0 +1,60 @@
+services:
+
+  db:
+    image: postgres:15-alpine
+    container_name: konbiniguard_db
+    restart: always
+    environment:
+      POSTGRES_DB: konbiniguard
+      POSTGRES_USER: konbini_admin
+      POSTGRES_PASSWORD: konbinipass
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - konbini_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U konbini_admin -d konbiniguard"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: konbiniguard_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "postgresql://konbini_admin:konbinipass@db:5432/konbiniguard"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  checker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    container_name: konbiniguard_checker
+    restart: always
+    environment:
+      DATABASE_URL: "postgresql://konbini_admin:konbinipass@db:5432/konbiniguard"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: konbiniguard_frontend
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  konbini_db_data:
