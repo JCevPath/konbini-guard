@@ -149,3 +149,12 @@ Thumbs.db
 # Docker / Postgres volumes
 *.db
 postgres_data/
+
+# Python / PyTest
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+venv/
+.venv/
+env/
