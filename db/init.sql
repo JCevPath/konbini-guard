@@ -1,15 +1,16 @@
-CREATE TABLE IF NOT EXISTS menu (
-    item_id SERIAL PRIMARY KEY,
-    item_name VARCHAR(100) NOT NULL,
-    price INT NOT NULL,
-    max_minutes INT NOT NULL,
+CREATE TABLE IF NOT EXISTS food_items (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    shelf_life_minutes INT NOT NULL,
+    price INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS food_batches (
-    batch_id SERIAL PRIMARY KEY,
-    item_id INT NOT NULL REFERENCES menu(item_id) ON DELETE CASCADE,
-    amount INT NOT NULL CHECK (amount > 0),
+CREATE TABLE IF NOT EXISTS batch_logs (
+    id SERIAL PRIMARY KEY,
+    item_id INT NOT NULL REFERENCES food_items(id) ON DELETE CASCADE,
+    quantity INT NOT NULL CHECK (quantity >= 0),
     status VARCHAR(20) DEFAULT 'FRESH',
     cooked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP NOT NULL
@@ -23,8 +24,8 @@ CREATE TABLE IF NOT EXISTS logs (
     logged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO menu (item_name, price, max_minutes) VALUES
-('Karaage (Fried Chicken)', 75, 240),
-('Pork Steamed Bun', 45, 180),
-('Hot Dog Stick', 35, 120),
-('Egg Salad Sandwich', 60, 360);
+INSERT INTO food_items (name, category, price, shelf_life_minutes) VALUES
+('Karaage (Fried Chicken)', 'Hot Snacks', 75, 240),
+('Pork Steamed Bun', 'Hot Snacks', 45, 180),
+('Hot Dog Stick', 'Hot Snacks', 35, 120),
+('Egg Salad Sandwich', 'Sandwiches', 60, 360);
