@@ -12,23 +12,58 @@ const CATEGORY_ITEMS = {
 const CATEGORIES = Object.keys(CATEGORY_ITEMS);
 
 export default function KonbiniGuardDashboard() {
-  const [batches, setBatches] = useState([
-    { id: 1, name: 'FamiChiki', category: 'Bento & Meals', quantity: 5, expiryDate: new Date(Date.now() + 2 * 24 * 3600 * 1000).toISOString() },
-    { id: 4, name: 'Karaage Bento', category: 'Bento & Meals', quantity: 8, expiryDate: new Date(Date.now() + 3 * 3600 * 1000).toISOString() },
-    { id: 2, name: 'Pork Katsu Curry', category: 'Bento & Meals', quantity: 4, expiryDate: new Date(Date.now() - 3600 * 1000).toISOString() },
-    { id: 3, name: 'Melon Pan', category: 'Bakery & Bread', quantity: 0, expiryDate: new Date(Date.now() - 7200 * 1000).toISOString() },
-  ]);
-
+  const [batches, setBatches] = useState([]);
+  const [items, setItems] = useState([]);
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [itemName, setItemName] = useState(CATEGORY_ITEMS[CATEGORIES[0]][0]);
   const [quantity, setQuantity] = useState(5);
   const [confirmingId, setConfirmingId] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
+
   useEffect(() => {
+    const fetchCatalogItems = async () => {
+      try {
+        const response = await fetch('/food/items');
+        if (response.ok) {
+          const data = await response.json();
+          setItems(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch catalog items:', err);
+      }
+    };
+
+    fetchCatalogItems();
+    fetchBatches();
+
     const timerInterval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
+
+    return () => clearInterval(timerInterval);
+  }, []);
+  // Fetch batches from backend API
+  const fetchBatches = async () => {
+    try {
+      const response = await fetch('/food/batches');
+      if (response.ok) {
+        const data = await response.json();
+        // Exclude discarded items from active view
+        setBatches(data.filter((b) => b.status !== 'DISCARDED'));
+      }
+    } catch (err) {
+      console.error('Failed to fetch food batches:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchBatches();
+
+    const timerInterval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
     return () => clearInterval(timerInterval);
   }, []);
 
@@ -38,7 +73,23 @@ export default function KonbiniGuardDashboard() {
     setItemName(CATEGORY_ITEMS[newCategory][0]);
   };
 
-  const evaluateBatchStatus = (expiryString) => {
+const evaluateBatchStatus = (batch) => {
+    // 1. Priority: Use the backend/database status if present
+    if (batch.status) {
+      const s = batch.status.toUpperCase();
+      if (s === 'EXPIRED') return { status: 'Expired', className: 'expired' };
+      if (s === 'NEAR_EXPIRATION' || s === 'NEAR EXPIRATION') {
+        return { status: 'Near Expiration', className: 'nearly-expired' };
+      }
+      if (s === 'FRESH') return { status: 'Fresh', className: 'fresh' };
+    }
+
+    // 2. Fallback: Dynamic client-side evaluation using expires_at
+    const expiryString = batch.expires_at || batch.expiry_date || batch.expiryDate;
+    if (!expiryString) {
+      return { status: 'Fresh', className: 'fresh' };
+    }
+
     const now = currentTime.getTime();
     const expiry = new Date(expiryString).getTime();
     const diffMs = expiry - now;
@@ -62,35 +113,61 @@ export default function KonbiniGuardDashboard() {
 
   const evaluatedBatches = batches.map((b) => ({
     ...b,
-    ...evaluateBatchStatus(b.expiryDate),
+    id: b.batch_id || b.id,
+    name: b.item_name || b.name || `Item #${b.item_id}`,
+    ...evaluateBatchStatus(b),
   }));
-
+  
   const totalActive = evaluatedBatches.length;
   const freshBatches = evaluatedBatches.filter((b) => b.status === 'Fresh').length;
   const nearBatches = evaluatedBatches.filter((b) => b.status === 'Near Expiration').length;
   const expiredBatches = evaluatedBatches.filter((b) => b.status === 'Expired').length;
 
-  const handleRemove = (id) => {
-    setBatches((prev) => prev.filter((b) => b.id !== id));
+    // Discard batch via PATCH /food/batches/{id}/discard
+  const handleRemove = async (id) => {
+    try {
+      const response = await fetch(`/food/batches/${id}/discard`, {
+        method: 'PATCH',
+      });
+
+      if (response.ok) {
+        // Instantly remove from UI table and update summary metrics
+        setBatches((prev) => prev.filter((b) => (b.batch_id || b.id) !== id));
+      }
+    } catch (err) {
+      console.error('Failed to discard batch:', err);
+    }
     setConfirmingId(null);
   };
 
-  const handleRegister = (e) => {
+  // Register batch via POST /food/batches
+  const handleRegister = async (e) => {
     e.preventDefault();
     if (!itemName) return;
-
-    const expiryDate = new Date(Date.now() + 24 * 3600 * 1000);
-
+    const selectedItem = items.find((i) => i.name === itemName);
+    const itemId = selectedItem ? selectedItem.id : 1;
     const newBatch = {
-      id: Date.now(),
-      name: itemName,
-      category,
+      item_id: itemId,
       quantity: Math.max(1, parseInt(quantity, 10) || 1),
-      expiryDate: expiryDate.toISOString(),
     };
 
-    setBatches((prev) => [newBatch, ...prev]);
-    setQuantity(5);
+    try {
+      const response = await fetch('/food/batches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newBatch),
+      });
+
+      if (response.ok) {
+        const savedBatch = await response.json();
+        setBatches((prev) => [savedBatch, ...prev]);
+        setQuantity(5);
+      } else {
+        console.error('Failed to register batch, status:', response.status);
+      }
+    } catch (err) {
+      console.error('Failed to register batch:', err);
+    }
   };
 
   return (
@@ -193,10 +270,10 @@ export default function KonbiniGuardDashboard() {
                   {evaluatedBatches.map((batch) => (
                     <tr key={batch.id}>
                       <td>
-                        <div className="item-name">{batch.name}</div>
-                        <div className="item-category">{batch.category}</div>
+                        <div className="item-name">{batch.name || batch.item_name}</div>
+                        <div className="item-category">{batch.category}</div> 
                       </td>
-                      <td style={{ fontWeight: 500, color: '#334155' }}>{batch.quantity} units</td>
+                      <td style={{ fontWeight: 500, color: '#334155' }}>{batch.quantity}</td>
                       <td>
                         <span className={`status-badge ${batch.className}`}>
                           <span className={`status-dot ${batch.className}`}></span>
@@ -259,7 +336,7 @@ export default function KonbiniGuardDashboard() {
               <p className="metric-value" style={{ color: '#d97706' }}>{nearBatches}</p>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p className="metric-title metric-label-expired">Expired / Discarded</p>
+              <p className="metric-title metric-label-expired">Expired</p>
               <p className="metric-value expired">{expiredBatches}</p>
             </div>
           </div>
