@@ -32,7 +32,6 @@ export default function KonbiniGuardDashboard() {
     return () => clearInterval(timerInterval);
   }, []);
 
-  // When category changes, reset item name to the first preset in that category
   const handleCategoryChange = (e) => {
     const newCategory = e.target.value;
     setCategory(newCategory);
@@ -61,18 +60,18 @@ export default function KonbiniGuardDashboard() {
     return { status: 'Fresh', className: 'fresh' };
   };
 
-  const evaluatedBatches = batches.map(b => ({
+  const evaluatedBatches = batches.map((b) => ({
     ...b,
-    ...evaluateBatchStatus(b.expiryDate)
+    ...evaluateBatchStatus(b.expiryDate),
   }));
 
   const totalActive = evaluatedBatches.length;
-  const freshBatches = evaluatedBatches.filter(b => b.status === 'Fresh').length;
-  const nearBatches = evaluatedBatches.filter(b => b.status === 'Near Expiration').length;
-  const expiredBatches = evaluatedBatches.filter(b => b.status === 'Expired').length;
+  const freshBatches = evaluatedBatches.filter((b) => b.status === 'Fresh').length;
+  const nearBatches = evaluatedBatches.filter((b) => b.status === 'Near Expiration').length;
+  const expiredBatches = evaluatedBatches.filter((b) => b.status === 'Expired').length;
 
   const handleRemove = (id) => {
-    setBatches(batches.filter(b => b.id !== id));
+    setBatches((prev) => prev.filter((b) => b.id !== id));
     setConfirmingId(null);
   };
 
@@ -86,12 +85,12 @@ export default function KonbiniGuardDashboard() {
       id: Date.now(),
       name: itemName,
       category,
-      quantity: Number(quantity),
+      quantity: Math.max(1, parseInt(quantity, 10) || 1),
       expiryDate: expiryDate.toISOString(),
     };
 
-    setBatches([newBatch, ...batches]);
-    // Keep the same category and itemName for convenience
+    setBatches((prev) => [newBatch, ...prev]);
+    setQuantity(5);
   };
 
   return (
@@ -209,12 +208,14 @@ export default function KonbiniGuardDashboard() {
                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                             <span style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Remove?</span>
                             <button
+                              type="button"
                               onClick={() => handleRemove(batch.id)}
                               style={{ backgroundColor: '#e11d48', color: 'white', border: 'none', padding: '4px 8px', borderRadius: 0, fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
                             >
                               Yes
                             </button>
                             <button
+                              type="button"
                               onClick={() => setConfirmingId(null)}
                               style={{ backgroundColor: '#e2e8f0', color: '#334155', border: 'none', padding: '4px 8px', borderRadius: 0, fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
                             >
@@ -223,6 +224,7 @@ export default function KonbiniGuardDashboard() {
                           </div>
                         ) : (
                           <button
+                            type="button"
                             onClick={() => setConfirmingId(batch.id)}
                             className="remove-btn"
                           >
