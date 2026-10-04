@@ -307,19 +307,23 @@ const evaluateBatchStatus = (batch) => {
             style={{ flex: '0 1 300px', display: 'flex', flexDirection: 'column', justifyContent: 'space-around', gap: '24px' }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p className="metric-title metric-label-total">Total Active Batches</p>
+              <p className="metric-title">Total Active Batches</p>
+              <p className="metric-value">{totalActive}</p>
             </div>
 
             <hr className="metric-separator" />
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p className="metric-title metric-label-fresh">Fresh Batches</p>
+              <p className="metric-title">Fresh Batches</p>
+              <p className="metric-value fresh">{freshBatches}</p>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p className="metric-title metric-label-near">Near Expiration</p>
+              <p className="metric-title">Near Expiration</p>
+              <p className="metric-value" style={{ color: '#d97706' }}>{nearBatches}</p>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p className="metric-title metric-label-expired">Expired</p>
+              <p className="metric-title">Expired</p>
+              <p className="metric-value expired">{expiredBatches}</p>
             </div>
           </div>
 
