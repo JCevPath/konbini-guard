@@ -29,7 +29,7 @@ pipeline {
                 sh 'cp $ENV_FILE .env'
                 }
                 sh 'docker compose -p konbiniguard build --no-cache backend'
-                sh 'docker compose -p konbiniguard up -d db'
+                sh 'docker compose -p konbiniguard up -d --wait db'
                 sh 'docker compose -p konbiniguard run --rm backend python -m pytest'
             }
         }
