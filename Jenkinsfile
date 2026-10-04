@@ -45,21 +45,22 @@ pipeline {
 
         stage('Smoke Test') {
             steps {
+                echo 'Validating service availability...'
                 sh '''
                   for i in $(seq 1 12); do
-                    if docker compose exec -T nginx curl -sf http://localhost:8080/health || docker compose exec -T backend curl -sf http://localhost:5000/health; then
-                      echo "Smoke test passed"
+                    if docker compose exec -T frontend wget -qO- http://localhost:80/ > /dev/null 2>&1 || \
+                       docker compose exec -T backend python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/')" > /dev/null 2>&1; then
+                      echo "Smoke test passed!"
                       exit 0
                     fi
                     echo "Waiting for KonbiniGuard services to start..."
                     sleep 5
                   done
-                  echo "Smoke test failed"
+                  echo "Smoke test failed: services did not respond in time."
                   exit 1
                 '''
             }
         }
-    }
 
     post {
         success {
