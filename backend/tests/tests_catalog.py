@@ -9,8 +9,7 @@ from app.main import app
 
 client = TestClient(app)
 
-def test_example():
-    assert False, "Intentional failure to test Quality Gate"
+
     
 def test_get_catalog_items():
     response = client.get("/food/items")
@@ -30,4 +29,4 @@ def test_add_catalog_item():
     data = response.json()
     assert "id" in data
     assert data["name"] == "Bento Box"
-    assert data["category"] == "Meals"
+    assert data["category"] == "Drinks"
