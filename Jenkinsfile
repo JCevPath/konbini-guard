@@ -48,15 +48,16 @@ pipeline {
                 echo 'Validating service availability...'
                 sh '''
                   for i in $(seq 1 12); do
-                    if docker compose exec -T frontend wget -qO- http://localhost:80/ > /dev/null 2>&1 || \
-                       docker compose exec -T backend python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/')" > /dev/null 2>&1; then
-                      echo "Smoke test passed!"
+                    if curl -sf http://localhost:8000/ > /dev/null 2>&1 || \
+                       curl -sf http://localhost:8080/ > /dev/null 2>&1 || \
+                       wget -qO- http://localhost:8000/ > /dev/null 2>&1; then
+                      echo "Smoke test passed"
                       exit 0
                     fi
                     echo "Waiting for KonbiniGuard services to start..."
                     sleep 5
                   done
-                  echo "Smoke test failed: services did not respond in time."
+                  echo "Smoke test failed."
                   exit 1
                 '''
             }
