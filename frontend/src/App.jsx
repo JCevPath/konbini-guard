@@ -43,13 +43,11 @@ export default function KonbiniGuardDashboard() {
 
     return () => clearInterval(timerInterval);
   }, []);
-  // Fetch batches from backend API
   const fetchBatches = async () => {
     try {
       const response = await fetch('/food/batches');
       if (response.ok) {
         const data = await response.json();
-        // Exclude discarded items from active view
         setBatches(data.filter((b) => b.status !== 'DISCARDED'));
       }
     } catch (err) {
@@ -74,7 +72,6 @@ export default function KonbiniGuardDashboard() {
   };
 
 const evaluateBatchStatus = (batch) => {
-    // 1. Priority: Use the backend/database status if present
     if (batch.status) {
       const s = batch.status.toUpperCase();
       if (s === 'EXPIRED') return { status: 'Expired', className: 'expired' };
@@ -84,7 +81,6 @@ const evaluateBatchStatus = (batch) => {
       if (s === 'FRESH') return { status: 'Fresh', className: 'fresh' };
     }
 
-    // 2. Fallback: Dynamic client-side evaluation using expires_at
     const expiryString = batch.expires_at || batch.expiry_date || batch.expiryDate;
     if (!expiryString) {
       return { status: 'Fresh', className: 'fresh' };
@@ -123,7 +119,6 @@ const evaluateBatchStatus = (batch) => {
   const nearBatches = evaluatedBatches.filter((b) => b.status === 'Near Expiration').length;
   const expiredBatches = evaluatedBatches.filter((b) => b.status === 'Expired').length;
 
-    // Discard batch via PATCH /food/batches/{id}/discard
   const handleRemove = async (id) => {
     try {
       const response = await fetch(`/food/batches/${id}/discard`, {
@@ -131,7 +126,6 @@ const evaluateBatchStatus = (batch) => {
       });
 
       if (response.ok) {
-        // Instantly remove from UI table and update summary metrics
         setBatches((prev) => prev.filter((b) => (b.batch_id || b.id) !== id));
       }
     } catch (err) {
@@ -140,7 +134,6 @@ const evaluateBatchStatus = (batch) => {
     setConfirmingId(null);
   };
 
-  // Register batch via POST /food/batches
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!itemName) return;
@@ -176,7 +169,6 @@ const evaluateBatchStatus = (batch) => {
 
         <header className="header">
           <div className="header-left">
-            <div className="logo-box">KG</div>
             <div>
               <h1 className="title">KonbiniGuard</h1>
               <p className="subtitle">Real-Time Food Freshness & Shelf-Life Management System</p>
