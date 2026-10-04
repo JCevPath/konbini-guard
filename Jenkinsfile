@@ -61,7 +61,7 @@ pipeline {
                 '''
             }
         }
-
+    }
     post {
         success {
             echo "KonbiniGuard build ${TAG} is live."
