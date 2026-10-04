@@ -6,7 +6,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 FROM base AS test
-RUN pip install pytest
+RUN pip install pytest httpx
 RUN pytest
 
 FROM base AS production
