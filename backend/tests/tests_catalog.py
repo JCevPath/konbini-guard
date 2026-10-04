@@ -11,7 +11,7 @@ client = TestClient(app)
 
 def test_example():
     assert False, "Intentional failure to test Quality Gate"
-    
+
 def test_get_catalog_items():
     response = client.get("/food/items")
     assert response.status_code == 200

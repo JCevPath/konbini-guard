@@ -24,7 +24,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'docker build --target test -t konbiniguard/backend:test ./backend || true'
+                sh 'docker build --target test -t konbiniguard/backend:test ./backend'
             }
         }
 
