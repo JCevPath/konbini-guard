@@ -7,7 +7,7 @@ pipeline {
     }
 
     triggers {
-        githubPush()  
+        pollSCM('H/2 * * * *')[cite: 1]
     }
 
     options {
