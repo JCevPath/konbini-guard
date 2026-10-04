@@ -26,6 +26,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: konbiniguard/backend:${TAG:-latest}
     container_name: konbiniguard_backend
     restart: always
     ports:
@@ -42,6 +43,7 @@ services:
     build:
       context: ./notification
       dockerfile: Dockerfile
+    image: konbiniguard/backend:${TAG:-latest}
     container_name: konbiniguard_checker
     restart: always
     environment:
@@ -56,6 +58,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    image: konbiniguard/backend:${TAG:-latest}
     container_name: konbiniguard_frontend
     restart: always
     ports:
