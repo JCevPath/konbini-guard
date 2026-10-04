@@ -29,4 +29,4 @@ def test_add_catalog_item():
     data = response.json()
     assert "id" in data
     assert data["name"] == "Bento Box"
-    assert data["category"] == "Drinks"
+    assert data["category"] == "Meals"
