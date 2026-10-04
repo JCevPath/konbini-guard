@@ -7,7 +7,7 @@ pipeline {
     }
 
     triggers {
-        pollSCM('H/2 * * * *')[cite: 1]
+        pollSCM('H/2 * * * *')
     }
 
     options {
