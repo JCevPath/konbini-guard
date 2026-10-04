@@ -143,3 +143,7 @@ def discard_batch(batch_id: int, db: Session = Depends(get_db)):
 
     db.commit()
     return updated_batch
+
+@app.get("/api/notifications/alerts")
+def get_alerts(db: Session = Depends(get_db)):
+    return []

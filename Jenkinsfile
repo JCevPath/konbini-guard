@@ -24,7 +24,9 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'docker build --target test -t konbiniguard/backend:test ./backend'
+                sh 'docker compose -p konbiniguard build --no-cache backend'
+                sh 'docker compose -p konbiniguard up -d db'
+                sh 'docker compose -p konbiniguard run --rm backend python -m pytest'
             }
         }
 
