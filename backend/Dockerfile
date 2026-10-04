@@ -7,7 +7,7 @@ COPY . .
 
 FROM base AS test
 RUN pip install pytest httpx
-RUN pytest
+RUN python -m pytest
 
 FROM base AS production
 EXPOSE 8000
