@@ -9,8 +9,6 @@ from app.main import app
 
 client = TestClient(app)
 
-def test_quality_gate_failure():
-    assert False, "Intentional failure to trigger quality gate"
 
 def test_inventory_health():
     response = client.get("/health")
