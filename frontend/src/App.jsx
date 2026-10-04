@@ -174,15 +174,10 @@ const evaluateBatchStatus = (batch) => {
               <p className="subtitle">Real-Time Food Freshness & Shelf-Life Management System</p>
             </div>
           </div>
-          <div className="sync-badge">
-            <span className="sync-dot"></span>
-            Live Sync Active
-          </div>
         </header>
 
         <div className="card card-green" style={{ marginBottom: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <span style={{ color: '#16a34a', fontSize: '18px' }}>➕</span>
             <h2 className="card-title" style={{ fontSize: '18px' }}>Register New Batch</h2>
           </div>
           <p className="card-note" style={{ marginBottom: '24px' }}>Add freshly prepared items to the live inventory.</p>
@@ -245,7 +240,6 @@ const evaluateBatchStatus = (batch) => {
           <div className="card card-blue" style={{ flex: '1 1 560px', minWidth: 0 }}>
             <div className="card-header">
               <h2 className="card-title">Live Inventory Status</h2>
-              <span className="card-note">Status updates every second</span>
             </div>
 
             <div className="table-responsive">
@@ -314,22 +308,18 @@ const evaluateBatchStatus = (batch) => {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p className="metric-title metric-label-total">Total Active Batches</p>
-              <p className="metric-value">{totalActive}</p>
             </div>
 
             <hr className="metric-separator" />
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p className="metric-title metric-label-fresh">Fresh Batches</p>
-              <p className="metric-value fresh">{freshBatches}</p>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p className="metric-title metric-label-near">Near Expiration</p>
-              <p className="metric-value" style={{ color: '#d97706' }}>{nearBatches}</p>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p className="metric-title metric-label-expired">Expired</p>
-              <p className="metric-value expired">{expiredBatches}</p>
             </div>
           </div>
 

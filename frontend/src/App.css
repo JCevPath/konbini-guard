@@ -90,34 +90,6 @@ body {
   }
 }
 
-.sync-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background-color: #ecfdf5;
-  color: #047857;
-  padding: 6px 12px;
-  border-radius: 0;
-  font-size: 13px;
-  font-weight: 600;
-  border: 1px solid #a7f3d0;
-  align-self: flex-start;
-}
-
-@media (min-width: 768px) {
-  .sync-badge {
-    align-self: auto;
-  }
-}
-
-.sync-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 0;
-  background-color: #10b981;
-}
-
-/* Metrics Grid */
 .metrics-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -154,28 +126,6 @@ body {
   margin: 0 0 8px 0;
 }
 
-.metric-value {
-  font-size: 30px;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0;
-}
-
-@media (min-width: 640px) {
-  .metric-value {
-    font-size: 36px;
-  }
-}
-
-.metric-value.fresh {
-  color: #059669;
-}
-
-.metric-value.expired {
-  color: #e11d48;
-}
-
-/* Main Grid Layout */
 .main-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -203,13 +153,11 @@ body {
   }
 }
 
-/* Green-tinted card for Register New Batch */
 .card-green {
   background-color: rgba(236, 253, 245, 0.88);
   border: 1px solid rgba(167, 243, 208, 0.7);
 }
 
-/* Blue-tinted card for Live Inventory */
 .card-blue {
   background-color: rgba(240, 249, 255, 0.88);
   border: 1px solid rgba(186, 230, 253, 0.7);
@@ -244,13 +192,6 @@ body {
   }
 }
 
-.card-note {
-  font-size: 13px;
-  color: #475569;
-  margin: 0;
-}
-
-/* Table */
 .table-responsive {
   width: 100%;
   overflow-x: auto;
