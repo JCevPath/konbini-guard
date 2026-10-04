@@ -48,9 +48,8 @@ pipeline {
                 echo 'Validating service availability...'
                 sh '''
                   for i in $(seq 1 12); do
-                    if curl -sf http://localhost:8000/ > /dev/null 2>&1 || \
-                       curl -sf http://localhost:8080/ > /dev/null 2>&1 || \
-                       wget -qO- http://localhost:8000/ > /dev/null 2>&1; then
+                      if docker run --rm --network konbiniguard_konbini_network curlimages/curl:latest curl -sf http://konbiniguard_backend:80/ > /dev/null 2>&1 || \
+                       docker run --rm --network konbiniguard_konbini_network curlimages/curl:latest curl -sf http://konbiniguard_frontend:80/ > /dev/null 2>&1; then
                       echo "Smoke test passed"
                       exit 0
                     fi
