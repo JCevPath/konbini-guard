@@ -9,6 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 FROM base AS test
+ENV PYTHONPATH=/app
 RUN pytest
 
 FROM base AS production
