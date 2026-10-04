@@ -6,7 +6,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 FROM base AS test
-RUN pip install pytest httpx
+RUN pip install pytest httpx psycopg[binary]
 RUN python -m pytest
 
 FROM base AS production
