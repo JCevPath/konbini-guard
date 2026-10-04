@@ -25,7 +25,7 @@ pipeline {
         stage('Test') {
             steps {
 
-                withCredentials([file(credentialsId: 'konbiniguard-env-file', variable: 'ENV_FILE')]) {
+                withCredentials([file(credentialsId: 'konbiniguard-env', variable: 'ENV_FILE')]) {
                 sh 'cp $ENV_FILE .env'
                 }
                 sh 'docker compose -p konbiniguard build --no-cache backend'
