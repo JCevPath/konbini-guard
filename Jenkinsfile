@@ -31,6 +31,7 @@ pipeline {
                 sh 'docker compose --env-file .env -p konbiniguard down -v || true'
                 sh 'docker compose --env-file .env -p konbiniguard build --no-cache backend'
                 sh 'docker compose --env-file .env -p konbiniguard up -d --wait db'
+                sh 'docker compose --env-file .env -p konbiniguard logs db'
                 sh 'docker compose --env-file .env -p konbiniguard run --rm backend python -m pytest'
             }
         }
