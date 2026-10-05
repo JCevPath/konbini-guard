@@ -32,6 +32,13 @@ pipeline {
                 sh 'docker compose --env-file .env -p konbiniguard build --no-cache backend'
                 sh 'docker compose --env-file .env -p konbiniguard up -d --wait db'
                 sh 'docker compose --env-file .env -p konbiniguard logs db || true'
+                sh '''
+                    docker compose --env-file .env -p konbiniguard up -d --wait db || {
+                        echo "Database failed to start or become healthy. Printing logs:"
+                        docker compose --env-file .env -p konbiniguard logs db
+                        exit 1
+                    }
+                '''
                 sh 'docker compose --env-file .env -p konbiniguard run --rm backend python -m pytest'
             }
         }
