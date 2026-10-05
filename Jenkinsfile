@@ -33,11 +33,13 @@ pipeline {
                 sh 'docker compose --env-file .env -p konbiniguard up -d --wait db'
                 sh 'docker compose --env-file .env -p konbiniguard logs db || true'
                 sh '''
-                    docker compose --env-file .env -p konbiniguard up -d --wait db || {
-                        echo "Database failed to start or become healthy. Printing logs:"
-                        docker compose --env-file .env -p konbiniguard logs db
-                        exit 1
-                    }
+                    if [ -d "db/init.sql" ]; then
+                        rm -rf db/init.sql
+                    fi
+                    if [ ! -f "db/init.sql" ]; then
+                        mkdir -p db
+                        touch db/init.sql
+                    fi
                 '''
                 sh 'docker compose --env-file .env -p konbiniguard run --rm backend python -m pytest'
             }
