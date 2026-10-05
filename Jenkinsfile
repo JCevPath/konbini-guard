@@ -30,15 +30,10 @@ pipeline {
                 }
 
                 sh 'docker compose --env-file .env -p konbiniguard down -v --rmi local || true'
-                
                 sh '''
-                    if [ -d "db/init.sql" ]; then
-                        rm -rf db/init.sql
-                    fi
-                    if [ ! -f "db/init.sql" ]; then
-                        mkdir -p db
-                        touch db/init.sql
-                    fi
+                    rm -rf db/init.sql
+                    mkdir -p db
+                    touch db/init.sql
                 '''
                 sh 'docker compose --env-file .env -p konbiniguard down -v || true'
                 sh 'docker compose --env-file .env -p konbiniguard build --no-cache backend'
