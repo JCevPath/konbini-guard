@@ -28,9 +28,9 @@ pipeline {
                 withCredentials([file(credentialsId: 'konbiniguard-env', variable: 'ENV_FILE')]) {
                 sh 'cp $ENV_FILE .env'
                 }
-                sh 'docker compose -p konbiniguard build --no-cache backend'
-                sh 'docker compose -p konbiniguard up -d --wait db'
-                sh 'docker compose -p konbiniguard run --rm backend python -m pytest'
+                sh 'docker compose --env-file .env -p konbiniguard build --no-cache backend'
+                sh 'docker compose --env-file .env -p konbiniguard up -d --wait db'
+                sh 'docker compose --env-file .env -p konbiniguard run --rm backend python -m pytest'
             }
         }
 
@@ -76,6 +76,7 @@ pipeline {
             echo "Build ${TAG} failed. Check stage logs. Roll back with: TAG=<previous> docker compose up -d --no-build"
         }
         always {
+            sh 'docker compose --env-file .env -p konbiniguard down'
             sh 'rm -f .env'
         }
     }
