@@ -27,7 +27,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      target: test
     image: konbiniguard/backend:${TAG:-latest}
     container_name: konbiniguard_backend
     restart: always
