@@ -76,7 +76,7 @@ pipeline {
             echo "Build ${TAG} failed. Check stage logs. Roll back with: TAG=<previous> docker compose up -d --no-build"
         }
         always {
-            sh 'docker compose --env-file .env -p konbiniguard down'
+            sh 'docker compose --env-file .env -p konbiniguard down -v'
             sh 'rm -f .env'
         }
     }
