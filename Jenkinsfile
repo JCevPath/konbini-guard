@@ -28,17 +28,10 @@ pipeline {
                 withCredentials([file(credentialsId: 'konbiniguard-env', variable: 'ENV_FILE')]) {
                 sh 'cp $ENV_FILE .env'
                 }
-
-                sh 'docker compose --env-file .env -p konbiniguard down -v --rmi local || true'
-                sh '''
-                    rm -rf db/init.sql
-                    mkdir -p db
-                    touch db/init.sql
-                '''
                 sh 'docker compose --env-file .env -p konbiniguard down -v || true'
+                sh 'docker compose --env-file .env -p konbiniguard up -d db'
+                sh 'sleep 10'
                 sh 'docker compose --env-file .env -p konbiniguard build --no-cache backend'
-                sh 'docker compose --env-file .env -p konbiniguard up -d --wait db'
-                sh 'docker compose --env-file .env -p konbiniguard logs db || true'
                 sh 'docker compose --env-file .env -p konbiniguard run --rm backend python -m pytest'
             }
         }
