@@ -32,7 +32,7 @@ pipeline {
                 sh 'docker compose --env-file .env -p konbiniguard up -d db'
                 sh 'sleep 10'
                 sh 'docker compose --env-file .env -p konbiniguard build --no-cache backend'
-                sh 'docker compose --env-file .env -p konbiniguard run --rm backend python -m pytest'
+                sh 'docker compose --env-file .env -p konbiniguard run --rm --env-file .env backend python -m pytest'
                 sh 'docker compose --env-file .env -p konbiniguard logs db'
             }
         }
