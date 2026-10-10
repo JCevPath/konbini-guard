@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS logs (
     logged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO food_items (name, category, price, shelf_life_minutes) VALUES
+INSERT INTO food_items (name, category, shelf_life_minutes) VALUES
 ('FamiChiki', 'Bento & Meals', 2),
 ('Karaage Bento', 'Bento & Meals', 2),
 ('Pork Katsu Curry', 'Bento & Meals', 1),
