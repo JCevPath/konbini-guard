@@ -99,20 +99,14 @@ const evaluateBatchStatus = (batch) => {
     }
 
     const diffSeconds = diffMs / 1000;
-    if (diffSeconds <= 30) {
-      return { status: 'Near Expiration', className: 'nearly-expired' };
-    }
 
     if (diffMs <= 0) {
       return { status: 'Expired', className: 'expired' };
     }
 
-    const diffHours = diffMs / (1000 * 60 * 60);
-
-    if (diffHours <= NEAR_EXPIRATION_HOURS) {
+    if (diffSeconds <= 30) {
       return { status: 'Near Expiration', className: 'nearly-expired' };
     }
-
     return { status: 'Fresh', className: 'fresh' };
   };
 
