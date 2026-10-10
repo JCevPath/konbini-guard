@@ -32,6 +32,7 @@ body {
   background-color: #1b5e20;
   padding: 20px;
   border-radius: 4px;
+  background: linear-gradient(180deg, #15803d 0%, #15803d 45%, #ffffff 50%, #0369a1 55%, #0369a1 100%);
   color: white;
 }
 
@@ -112,6 +113,13 @@ body {
   border-radius: 4px;
   font-size: 14px;
   background-color: #fff;
+  color: #333333;
+}
+
+.selectInput option {
+  background-color: #ffffff;
+  color: #333333;
+  padding: 8px;
 }
 
 .submitBTN {

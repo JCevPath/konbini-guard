@@ -37,11 +37,18 @@ export default function KonbiniGuardDashboard() {
     fetchCatalogItems();
     fetchBatches();
 
+    const batchInterval = setInterval(() => {
+      fetchBatches();
+    }, 3000);
+
     const timerInterval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(timerInterval);
+    return () => {
+       clearInterval(timerInterval);
+       clearInterval(batchInterval);
+    };
   }, []);
   const fetchBatches = async () => {
     try {
@@ -54,16 +61,6 @@ export default function KonbiniGuardDashboard() {
       console.error('Failed to fetch food batches:', err);
     }
   };
-
-  useEffect(() => {
-    fetchBatches();
-
-    const timerInterval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timerInterval);
-  }, []);
 
   const handleCategoryChange = (e) => {
     const newCategory = e.target.value;
