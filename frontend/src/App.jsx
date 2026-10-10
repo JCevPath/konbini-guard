@@ -78,7 +78,7 @@ const evaluateBatchStatus = (batch) => {
       if (s === 'FRESH') return { status: 'Fresh', className: 'fresh' };
     }
 
-    const expiryString = batch.expires_at || batch.expiry_date || batch.expiryDate;
+    let expiryString = batch.expires_at || batch.expiry_date || batch.expiryDate;
     if (!expiryString) {
       return { status: 'Fresh', className: 'fresh' };
     }
