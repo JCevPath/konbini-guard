@@ -8,8 +8,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../back
 from app.main import app
 
 client = TestClient(app)
-
-
     
 def test_get_catalog_items():
     response = client.get("/food/items")

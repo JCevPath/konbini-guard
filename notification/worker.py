@@ -21,10 +21,8 @@ def run_expiration_check():
     try:
         with get_connection() as conn:
             with conn.cursor(row_factory=dict_row) as cursor:
-                # Use timezone-aware UTC datetime
                 now = datetime.now(timezone.utc)
 
-                # Fetch active batches that are not yet discarded or expired
                 cursor.execute("""
                     SELECT id AS batch_id, item_id, status, expires_at 
                     FROM batch_logs 
@@ -34,29 +32,24 @@ def run_expiration_check():
 
                 for batch in batches:
                     expires_at = batch["expires_at"]
-                    # Ensure expires_at is timezone-aware for comparison
                     if expires_at.tzinfo is None:
                         expires_at = expires_at.replace(tzinfo=timezone.utc)
 
                     time_left_seconds = (expires_at - now).total_seconds()
                     new_status = None
 
-                    # If expired
                     if time_left_seconds <= 0 and batch["status"] != "EXPIRED":
                         new_status = "EXPIRED"
-                    # If near expiry (10 minutes / 600 seconds left)
                     elif 0 < time_left_seconds <= 600 and batch["status"] == "FRESH":
                         new_status = "NEAR_EXPIRY"
 
                     if new_status:
-                        # 1. Update batch status
                         cursor.execute("""
                             UPDATE batch_logs 
                             SET status = %s 
                             WHERE id = %s;
                         """, (new_status, batch["batch_id"]))
 
-                        # 2. Log alert action into system logs
                         cursor.execute("""
                             INSERT INTO logs (batch_id, action_type, info)
                             VALUES (%s, %s, %s);
@@ -74,7 +67,7 @@ def run_expiration_check():
 
 
 if __name__ == "__main__":
-    print("Expiration Guard Worker started. Scanning database every 10 seconds...")
+    print("Expiration Guard Worker started. Scanning database every 10 seconds.")
     while True:
         run_expiration_check()
         time.sleep(10)
