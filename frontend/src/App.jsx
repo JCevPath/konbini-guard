@@ -83,12 +83,24 @@ const evaluateBatchStatus = (batch) => {
       return { status: 'Fresh', className: 'fresh' };
     }
 
+    
+    if (typeof expiryString === 'string' && !expiryString.endsWith('Z') && !expiryString.includes('+')) {
+      expiryString += 'Z';
+    }
+
     const now = currentTime.getTime();
     const expiry = new Date(expiryString).getTime();
     const diffMs = expiry - now;
 
+  
+
     if (isNaN(expiry)) {
       return { status: 'Invalid Date', className: 'expired' };
+    }
+
+    const diffSeconds = diffMs / 1000;
+    if (diffSeconds <= 30) {
+      return { status: 'Near Expiration', className: 'nearly-expired' };
     }
 
     if (diffMs <= 0) {

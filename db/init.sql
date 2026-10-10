@@ -25,7 +25,12 @@ CREATE TABLE IF NOT EXISTS logs (
 );
 
 INSERT INTO food_items (name, category, price, shelf_life_minutes) VALUES
-('Karaage (Fried Chicken)', 'Hot Snacks', 75, 2),
-('Pork Steamed Bun', 'Hot Snacks', 45, 2),
-('Hot Dog Stick', 'Hot Snacks', 35, 1),
-('Egg Salad Sandwich', 'Sandwiches', 60, 3);
+('FamiChiki', 'Bento & Meals', 2),
+('Karaage Bento', 'Bento & Meals', 2),
+('Pork Katsu Curry', 'Bento & Meals', 1),
+('Melon Pan', 'Bakery & Bread', 1),
+('Cream Bread', 'Bakery & Bread', 3),
+('Roll Cakes', 'Bakery & Bread', 2),
+('Cucumber Chips', 'Snacks', 3),
+('Potato Chips', 'Snacks', 1),
+('Calbee Chips', 'Snacks', 2);
