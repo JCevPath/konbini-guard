@@ -94,7 +94,7 @@ pipeline {
             echo "Build ${TAG} failed. Restoring previous stack state..."
             withCredentials([file(credentialsId: 'konbiniguard-env', variable: 'ENV_FILE')]) {
                 sh 'cp "$ENV_FILE" .env'
-                sh 'docker compose --env-file .env -p konbiniguard up -d --no-build || true'
+                sh 'TAG="" docker compose --env-file .env -p konbiniguard up -d --no-build || true'           
             }
         }
         always {
