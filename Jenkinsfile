@@ -39,7 +39,7 @@ pipeline {
 
         stage('Build Images') {
             steps {
-                sh 'docker compose build'
+                sh 'docker compose --env-file .env -p konbiniguard build'
             }
         }
 
@@ -49,6 +49,7 @@ pipeline {
                     sh 'cp "$ENV_FILE" .env'
                 }
                 sh 'docker compose --env-file .env -p konbiniguard down --remove-orphans'
+                sh 'docker rm -f konbiniguard_db konbiniguard_backend konbiniguard_checker konbiniguard_frontend 2>/dev/null || true'
                 sh 'docker compose --env-file .env -p konbiniguard up -d --no-build'
             }
         }
