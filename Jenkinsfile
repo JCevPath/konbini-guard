@@ -44,7 +44,7 @@ pipeline {
                 
                 sh '''
                   docker compose --env-file .env -p konbiniguard exec -T db psql -U konbini_admin -d konbiniguard -tAc \
-                  "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'food_items');" | grep -q t || \
+                  "SELECT COUNT(*) FROM food_items;" | grep -qE '[1-9]' || \
                   docker compose --env-file .env -p konbiniguard exec -T db psql -U konbini_admin -d konbiniguard < db/init.sql
                 '''
             }
