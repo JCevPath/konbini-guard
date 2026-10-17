@@ -18,7 +18,7 @@ KonbiniGuard is a real-time food freshness and shelf-life tracking system design
 ## Key System Features
 
 ### Data Persistence
-The database uses a dedicated Docker named volume (`konbini_db_data`). This ensures that logged inventory items and store metadata remain intact across container restarts, code updates, and pipeline rebuilds.
+The database uses a dedicated Docker named volume (konbini_db_data). This ensures that logged inventory items and store metadata remain intact across container restarts, code updates, and pipeline rebuilds.
 
 ### Pipeline Recovery and Reliability
 The CI/CD pipeline is configured to protect against accidental downtime:
@@ -30,36 +30,31 @@ The CI/CD pipeline is configured to protect against accidental downtime:
 
 ## Environment Configuration
 
-The application requires an environment file (`.env`) in the project root.
+The application requires an environment file (.env) in the project root.
 
-In the Jenkins CI/CD environment, these values are stored as a file credential under the ID `konbiniguard-env`.
+In the Jenkins CI/CD environment, these values are stored as a file credential under the ID konbiniguard-env.
 
 ---
 
 ## Local Setup
 
 1. **Clone the repository:**
-   ```bash
    git clone <repository-url>
    cd konbiniguard
-   ```
+
 
 2. **Configure environment variables:**
-   Create a `.env` file in the root folder using the parameters listed above.
+   Create a .env file in the root folder using the parameters listed above.
 
 3. **Start the application stack:**
-   ```bash
    docker compose up -d --build
-   ```
 
 4. **Access services:**
    * Web Interface: `http://localhost`
    * API Documentation: `http://localhost:8000/docs`
 
 5. **Stop the stack:**
-   ```bash
    docker compose -p konbiniguard down
-   ```
 
 ---
 
@@ -67,18 +62,15 @@ In the Jenkins CI/CD environment, these values are stored as a file credential u
 
 To run the backend test suite locally within the Docker environment:
 
-```bash
 docker compose --env-file .env -p konbiniguard run --rm backend python -m pytest
-```
 
----
 
 ## Jenkins Pipeline Summary
 
-The `Jenkinsfile` automates the following steps on every code push:
+The Jenkinsfile automates the following steps on every code push:
 
 1. **Checkout:** Clones the repository.
-2. **Test:** Starts the database, verifies schema presence, executes `pytest`, and ensures default data is present post-testing.
+2. **Test:** Starts the database, verifies schema presence, executes pytest, and ensures default data is present post-testing.
 3. **Build Images:** Builds Docker images tagged with the active build number.
-4. **Deploy:** Stops old application containers and starts the new images using `docker compose`.
+4. **Deploy:** Stops old application containers and starts the new images using docker compose.
 5. **Smoke Test:** Verifies HTTP response codes from both frontend and backend endpoints before confirming deployment success.
