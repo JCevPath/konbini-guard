@@ -38,10 +38,12 @@ pipeline {
                   "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'food_items');" | grep -q t || \
                   docker compose --env-file .env -p konbiniguard exec -T db psql -U konbini_admin -d konbiniguard < db/init.sql
                 '''
-                
+                sh '''
+                  docker compose --env-file .env -p konbiniguard exec -T db psql -U konbini_admin -d konbiniguard -c \
+                  "SELECT 'CREATE DATABASE konbiniguard_test' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'konbiniguard_test')\\gexec"
+                '''
                 sh 'docker compose --env-file .env -p konbiniguard build --no-cache backend'
-                sh 'docker compose --env-file .env -p konbiniguard run --rm -e DATABASE_URL=postgresql+psycopg2://konbini_admin:konbinipass@db:5432/konbiniguard backend python -m pytest'
-            }
+                sh 'docker compose --env-file .env -p konbiniguard run --rm -e DATABASE_URL=postgresql+psycopg2://konbini_admin:konbinipass@db:5432/konbiniguard_test backend python -m pytest'            }
         }
 
         stage('Build Images') {
@@ -86,6 +88,7 @@ pipeline {
         }
         failure {
             echo "Build ${TAG} failed. Check stage logs. Roll back with: TAG=<previous> docker compose up -d --no-build"
+            sh 'docker compose --env-file .env -p konbiniguard up -d --no-build || true'
         }
         always {
             sh 'rm -f .env'
