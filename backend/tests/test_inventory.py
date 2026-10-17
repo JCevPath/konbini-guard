@@ -25,7 +25,7 @@ def test_create_and_discard_batch():
     data = create_res.json()
     assert data["item_id"] == 1
     assert data["quantity"] == 10
-    assert data["status"] == "EXPIRED"
+    assert data["status"] == "FRESH"
     
     batch_id = data["batch_id"]
 
