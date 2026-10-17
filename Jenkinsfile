@@ -91,11 +91,11 @@ pipeline {
             echo "KonbiniGuard build ${TAG} is live."
         }
         failure {
-            echo "Build ${TAG} failed. Check stage logs."
+            echo "Build ${TAG} failed. Restoring previous stack state..."
             withCredentials([file(credentialsId: 'konbiniguard-env', variable: 'ENV_FILE')]) {
                 sh 'cp "$ENV_FILE" .env'
+                sh 'docker compose --env-file .env -p konbiniguard up -d --no-build || true'
             }
-            sh 'docker compose --env-file .env -p konbiniguard up -d --no-build || true'
         }
         always {
             sh 'rm -f .env'
