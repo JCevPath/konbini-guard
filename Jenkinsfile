@@ -29,6 +29,7 @@ pipeline {
                 sh 'cp $ENV_FILE .env'
                 }
                 sh 'docker compose -p konbiniguard down --remove-orphans'
+                sh 'docker rm -f konbiniguard_db 2>/dev/null || true'
                 sh 'docker compose --env-file .env -p konbiniguard up -d db'
                 sh 'sleep 10'
                 sh 'docker compose --env-file .env -p konbiniguard exec -T db psql -U konbini_admin -d konbiniguard < db/init.sql'
