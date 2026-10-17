@@ -38,9 +38,11 @@ pipeline {
                   "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'food_items');" | grep -q t || \
                   docker compose --env-file .env -p konbiniguard exec -T db psql -U konbini_admin -d konbiniguard < db/init.sql
                 '''
+
                 sh '''
-                  docker compose --env-file .env -p konbiniguard exec -T db psql -U konbini_admin -d konbiniguard -c \
-                  "SELECT 'CREATE DATABASE konbiniguard_test' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'konbiniguard_test')\\gexec"
+                  docker compose --env-file .env -p konbiniguard exec -T db psql -U konbini_admin -d konbiniguard -tAc \
+                  "SELECT 1 FROM pg_database WHERE datname = 'konbiniguard_test';" | grep -q 1 || \
+                  docker compose --env-file .env -p konbiniguard exec -T db psql -U konbini_admin -d konbiniguard -c "CREATE DATABASE konbiniguard_test;"
                 '''
                 sh 'docker compose --env-file .env -p konbiniguard build --no-cache backend'
                 sh 'docker compose --env-file .env -p konbiniguard run --rm -e DATABASE_URL=postgresql+psycopg2://konbini_admin:konbinipass@db:5432/konbiniguard_test backend python -m pytest'            }
@@ -87,7 +89,10 @@ pipeline {
             echo "KonbiniGuard build ${TAG} is live."
         }
         failure {
-            echo "Build ${TAG} failed. Check stage logs. Roll back with: TAG=<previous> docker compose up -d --no-build"
+            echo "Build ${TAG} failed. Check stage logs."
+            withCredentials([file(credentialsId: 'konbiniguard-env', variable: 'ENV_FILE')]) {
+                sh 'cp "$ENV_FILE" .env'
+            }
             sh 'docker compose --env-file .env -p konbiniguard up -d --no-build || true'
         }
         always {
