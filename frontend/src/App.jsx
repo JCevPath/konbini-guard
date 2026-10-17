@@ -172,7 +172,7 @@ const evaluateBatchStatus = (batch) => {
 
           <header className="topHeader">
             <div className="headerText">
-              <h1 className="mainTitle">KonbiniGuard Dashboard</h1>
+              <h1 className="mainTitle">KonbiniGuard</h1>
               <p className="subTitle">Real-Time Food Freshness & Shelf-Life Management System</p>
             </div>
           </header>
