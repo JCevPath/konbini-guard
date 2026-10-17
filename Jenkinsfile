@@ -90,17 +90,11 @@ pipeline {
         success {
             echo "KonbiniGuard build ${TAG} is live."
         }
-
         failure {
             echo "Build ${TAG} failed. Restoring previous stack state..."
-            script {
-                def prevBuild = currentBuild.previousSuccessfulBuild?.number ?: "latest"
-                echo "Rolling back to last successful build: ${prevBuild}"
-                
-                withCredentials([file(credentialsId: 'konbiniguard-env', variable: 'ENV_FILE')]) {
-                    sh 'cp "$ENV_FILE" .env'
-                    sh "TAG=${prevBuild} docker compose --env-file .env -p konbiniguard up -d --no-build || true"
-                }
+            withCredentials([file(credentialsId: 'konbiniguard-env', variable: 'ENV_FILE')]) {
+                sh 'cp "$ENV_FILE" .env'
+                sh 'TAG="" docker compose --env-file .env -p konbiniguard up -d --no-build || true'           
             }
         }
         always {
