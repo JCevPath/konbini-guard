@@ -46,10 +46,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 withCredentials([file(credentialsId: 'konbiniguard-env', variable: 'ENV_FILE')]) {
-                    sh 'docker compose down --remove-orphans'
                     sh 'cp "$ENV_FILE" .env'
-                    sh 'docker compose up -d --no-build'
                 }
+                sh 'docker compose --env-file .env -p konbiniguard down --remove-orphans'
+                sh 'docker compose --env-file .env -p konbiniguard up -d --no-build'
             }
         }
 
